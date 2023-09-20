@@ -41,7 +41,6 @@ function addTicket(ticket_id,employee, establishment, cost, date,){
             approval,
         }
     }
-    console.log(params);
     return docClient.put(params).promise();
 };
 
@@ -54,20 +53,36 @@ function retrieveTicketById(ticket_id){
             ticket_id
         }
     }
-
     return docClient.get(params).promise();
 }
 function retrieveTicketsByEmployee(employee){
     const params = {
         TableName: 'reimbursement_system',
-        Key: {
-            employee
+        FilterExpression: 'contains(#employee, :employee)',
+        ExpressionAttributeNames: {
+            '#employee': 'employee',
+        },
+        ExpressionAttributeValues: {
+            ':employee': employee,
         }
     }
 
-    return docClient.get(params).promise();
+    return docClient.scan(params).promise();
 }
+function retrievePendingTickets(){
+    const params = {
+        TableName: 'reimbursement_system',
+        FilterExpression: 'contains(#approval, :approval)',
+        ExpressionAttributeNames: {
+            '#approval': 'approval',
+        },
+        ExpressionAttributeValues: {
+            ':approval': 'Pending...',
+        }
+    }
 
+    return docClient.scan(params).promise();
+}
 // retrieve a list
 // scan operation
 // this operation is inefficient as it will go through the entire list
@@ -120,6 +135,7 @@ function retrieveAllTickets(){
 // Update
 
 function updateApprovalById(ticket_id, approval){
+    const pending = 'Pending...'
     const params = {
         TableName: 'reimbursement_system',
         Key: {
@@ -130,8 +146,10 @@ function updateApprovalById(ticket_id, approval){
             '#approval': 'approval'
         },
         ExpressionAttributeValues:{
-            ':approval': approval
-        }
+            ':approval': approval,
+            ':p': pending
+        },
+        ConditionExpression: 'contains(#approval, :p)'
     }
 
     return docClient.update(params).promise();
@@ -155,6 +173,7 @@ module.exports = {
     retrieveTicketById,
     retrieveAllTickets,
     retrieveTicketsByEmployee,
+    retrievePendingTickets,
     updateApprovalById,
     deleteTicketById
 };

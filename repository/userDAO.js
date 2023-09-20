@@ -12,10 +12,10 @@ function login(username, password)
         Key: {
             username
         },
-        ConditionExpression: 'attribute_exists(username)',
         AttributeValue: {
             password
         }, 
+        ConditionExpression: 'attribute_exists(username) AND attribute_exists(password)',
     };
     return docClient.get(params).promise();
 }

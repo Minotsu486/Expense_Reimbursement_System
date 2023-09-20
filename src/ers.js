@@ -35,10 +35,7 @@ const logger = createLogger({
         new transports.File({ filename: 'ers.log'}), // log to a file
     ]
 })
-function getLogger()
-{
-    return logger;
-}
+
 
 //Server
 server.get('/login', (req, res) => {

@@ -8,44 +8,62 @@ router.get('/', (req, res) => {
         res.send(data.Items);
     })
     .catch((err) => {
-        ers.getLogger().error(err);
-        res.send("Failed to Retrieve Tickets!");
+        ers.logger.error(err);
+        res.status(400).send("Failed to Retrieve Tickets!");
     });
 });
 router.get('/id', (req, res) => {
     const ticket = req.body;
-    ersDao.retrieveTicketById(ticket.id)
+    console.log(ticket);
+    ersDao.retrieveTicketById(ticket.ticket_id)
     .then((data) => {
-        res.send(data.Items);
+        res.send(data.Item);
     })
     .catch((err) => {
-        ers.getLogger().error(err);
+        ers.logger.error(err);
         res.sendStatus(400);
-        res.send("Failed to Retrieve Tickets!");
+        res.status(400).send("Failed to Retrieve Tickets!");
     });
 });
 router.get('/name', (req, res) => {
-    const ticket = req.body;
-    ersDao.retrieveTicketsByEmployee(ticket.employee)
+    const name = req.body;
+    ersDao.retrieveTicketsByEmployee(name.employee)
     .then((data) => {
         res.send(data.Items);
     })
     .catch((err) => {
-        ers.getLogger().error(err);
+        ers.logger.error(err);
         res.sendStatus(400);
-        res.send("Failed to Retrieve Tickets!");
+        res.status(400).send("Failed to Retrieve Tickets!");
+    });
+});
+router.get('/pending', (req, res) => {
+    ersDao.retrievePendingTickets()
+    .then((data) => {
+        res.send(data.Items);
+    })
+    .catch((err) => {
+        ers.logger.error(err);
+        res.status(400).send("Failed to Retrieve Tickets!");
     });
 });
 router.patch('/', (req, res) => {
     const ticket = req.body;
-    ersDao.updateApprovalById(ticket.id,ticket.approval)
+    ersDao.updateApprovalById(ticket.ticket_id,ticket.approval)
     .then((data) => {
-        res.send(data.Items);
+        ersDao.retrievePendingTickets()
+        .then((data) => {
+            res.send(data.Items);
+        })
+        .catch((err) => {
+            //ers.logger.error(err);
+            res.status(400).send("Failed to Approve/Deny Ticket!");
+        });
+        //res.send("Approval/Denial Successful!");
     })
     .catch((err) => {
-        ers.getLogger().error(err);
-        res.sendStatus(400);
-        res.send("Failed to Approve/Deny Ticket!");
+        //ers.getLogger().error(err);
+        res.status(400).send("Failed to Approve/Deny Ticket!");
     });
 });
 module.exports = router;
