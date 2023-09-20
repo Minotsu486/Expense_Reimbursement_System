@@ -151,7 +151,6 @@ function deleteTicketById(ticket_id){
 
 
 module.exports = {
-    login,
     addTicket,
     retrieveTicketById,
     retrieveAllTickets,

@@ -46,7 +46,7 @@ server.get('/login', (req, res) => {
     userDao.login(loginInfo.username, loginInfo.password)
     .then((data) => {
         logger.info("Successful Login")
-        res.send("Login Successful!");
+        res.send(`Login Successful! Welcome ${data.Item.position} ${data.Item.name}`);
     })
     .catch((err) => {
         logger.error(err);
