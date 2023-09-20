@@ -2,13 +2,17 @@ const { createLogger, transports, format} = require('winston');
 const emp = require('./routes/employee');
 const fm = require('./routes/finance_manager');
 const uuid = require('uuid');
+const userDao = require('../repository/userDAO');
 const ersDao = require('../repository/ersDAO');
 const express = require('express');
 const server = express();
 const port = 3000;
 const bodyParser = require('body-parser');
+
+//use x-www-form-urlencoded in Postman
 server.use(bodyParser.urlencoded({extended: true}));
 server.use(bodyParser.json());
+
 server.use('/employee', emp);
 server.use('/fmanager', fm);
 
@@ -39,7 +43,7 @@ function getLogger()
 //Server
 server.get('/login', (req, res) => {
     const loginInfo = req.body;
-    ersDao.login(loginInfo.username, loginInfo.password)
+    userDao.login(loginInfo.username, loginInfo.password)
     .then((data) => {
         logger.info("Successful Login")
         res.send("Login Successful!");
@@ -48,6 +52,31 @@ server.get('/login', (req, res) => {
         logger.error(err);
         res.send("Failed to Login!");
     });
+});
+server.post('/register', (req, res) => {
+    const reg = req.body;
+    if(!reg.fmKey)
+    {
+        userDao.register(reg.username,reg.password,reg.name)
+        .then((data) => {
+        res.send(`Successfully Registered! Welcome ${reg.name}!`);
+        })
+        .catch((err) => {
+            ers.logger.error(err);
+            res.status(400).send("Failed to Register!");
+        });
+    }else if(reg.fmKey === 'Real Manager')
+    {
+        userDao.register(reg.username,reg.password,reg.name,'Finance Manager')
+    .then((data) => {
+        res.send(`Successfully Registered! Welcome Finance Manager ${reg.name}!`);
+    })
+    .catch((err) => {
+        ers.logger.error(err);
+        res.status(400).send("Failed to Register!");
+    });
+    }
+
 });
 server.listen(port, () => {
     console.log(`Server is listening on http://localhost:${port}`);
