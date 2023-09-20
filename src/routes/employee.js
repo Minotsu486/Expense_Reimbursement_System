@@ -14,10 +14,21 @@ router.get('/', (req, res) => {
         res.status(400).send("Failed to Retrieve Tickets!");
     });
 });
+router.get('/type', (req, res) => {
+    const ticket = req.body;
+    ersDao.retrieveTicketsByType(ticket.employee, ticket.type)
+    .then((data) => {
+        res.send(data.Items);
+    })
+    .catch((err) => {
+        ers.logger.error(err);
+        res.status(400).send("Failed to Retrieve Tickets!");
+    });
+});
 
 router.post('/', (req, res) => {
     const ticket = req.body;
-    ersDao.addTicket(uuid.v4(), ticket.employee,ticket.establishment,ticket.cost,new Date(Date.now()).toLocaleString())
+    ersDao.addTicket(uuid.v4(), ticket.employee, ticket.establishment, ticket.type, ticket.cost,new Date(Date.now()).toLocaleString())
     .then((data) => {
         res.send("Successfully Added Ticket!");
     })

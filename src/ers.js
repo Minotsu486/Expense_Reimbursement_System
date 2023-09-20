@@ -59,7 +59,7 @@ server.post('/register', (req, res) => {
         res.send(`Successfully Registered! Welcome ${reg.name}!`);
         })
         .catch((err) => {
-            ers.logger.error(err);
+            logger.error(err);
             res.status(400).send("Failed to Register!");
         });
     }else if(reg.fmKey === 'Real Manager')
@@ -69,8 +69,8 @@ server.post('/register', (req, res) => {
         res.send(`Successfully Registered! Welcome Finance Manager ${reg.name}!`);
     })
     .catch((err) => {
-        ers.logger.error(err);
-        res.status(400).send("Failed to Register!");
+        logger.error(err);
+        res.status(400).send("Username Unavailable!");
     });
     }
 

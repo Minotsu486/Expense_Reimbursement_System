@@ -28,7 +28,7 @@ const docClient = new AWS.DynamoDB.DocumentClient();
 // Delete
 
 // Create
-function addTicket(ticket_id,employee, establishment, cost, date,){
+function addTicket(ticket_id,employee, establishment, type, cost, date,){
     const approval = "Pending...";
     const params = {
         TableName: 'reimbursement_system',
@@ -36,6 +36,7 @@ function addTicket(ticket_id,employee, establishment, cost, date,){
             ticket_id,
             employee,
             establishment,
+            type,
             cost,
             date,
             approval,
@@ -69,6 +70,23 @@ function retrieveTicketsByEmployee(employee){
 
     return docClient.scan(params).promise();
 }
+function retrieveTicketsByType(employee, type){
+    const params = {
+        TableName: 'reimbursement_system',
+        FilterExpression: 'contains(#employee, :employee) AND contains(#type, :type)',
+        ExpressionAttributeNames: {
+            '#employee': 'employee',
+            '#type': 'type',
+        },
+        ExpressionAttributeValues: {
+            ':employee': employee,
+            ':type':type,
+        }
+    }
+
+    return docClient.scan(params).promise();
+}
+
 function retrievePendingTickets(){
     const params = {
         TableName: 'reimbursement_system',
@@ -173,6 +191,7 @@ module.exports = {
     retrieveTicketById,
     retrieveAllTickets,
     retrieveTicketsByEmployee,
+    retrieveTicketsByType,
     retrievePendingTickets,
     updateApprovalById,
     deleteTicketById
