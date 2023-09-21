@@ -2,67 +2,111 @@ const express = require('express');
 const router = express.Router();
 const ersDao = require('../../repository/ersDAO');
 const ers = require('../ers');
-router.get('/', (req, res) => {
+const jwtUtil = require('../utility/jwt_util');
+const logger = require('winston');
+function authManager(req, res, next)
+{
+    const token = req.headers.authorization.split(' ')[1]; // ['Bearer', '<token>'];
+    jwtUtil.verifyTokenAndReturnPayload(token)
+        .then((payload) => {
+            if(payload.position === 'Finance Manager'){
+                
+                next();
+            }else{
+                res.statusCode = 401;
+                res.send({
+                    message: `You are not a Finance Manager, you are a ${payload.position}`
+                });
+            }
+        })
+        .catch((err) => {
+            res.statusCode = 401;
+            res.send({
+                message: "Failed to Authenticate Token"
+            });
+        })
+}
+router.use(authManager);
+router.get('/',  (req, res) => {
     ersDao.retrieveAllTickets()
     .then((data) => {
         res.send(data.Items);
     })
     .catch((err) => {
-        ers.logger.error(err);
+        logger.error(err);
         res.status(400).send("Failed to Retrieve Tickets!");
     });
 });
-router.get('/id', (req, res) => {
+router.get('/id',  (req, res) => {
     const ticket = req.body;
-    console.log(ticket);
     ersDao.retrieveTicketById(ticket.ticket_id)
     .then((data) => {
         res.send(data.Item);
     })
     .catch((err) => {
-        ers.logger.error(err);
+        logger.error(err);
         res.sendStatus(400);
         res.status(400).send("Failed to Retrieve Tickets!");
     });
 });
-router.get('/name', (req, res) => {
+router.get('/name',  (req, res) => {
     const name = req.body;
     ersDao.retrieveTicketsByEmployee(name.employee)
     .then((data) => {
         res.send(data.Items);
     })
     .catch((err) => {
-        ers.logger.error(err);
+        logger.error(err);
         res.sendStatus(400);
         res.status(400).send("Failed to Retrieve Tickets!");
     });
 });
-router.get('/pending', (req, res) => {
+router.get('/pending',  (req, res) => {
     ersDao.retrievePendingTickets()
     .then((data) => {
         res.send(data.Items);
     })
     .catch((err) => {
-        ers.logger.error(err);
+        logger.error(err);
         res.status(400).send("Failed to Retrieve Tickets!");
     });
 });
-router.patch('/', (req, res) => {
+router.put('/',  (req, res) => {
     const ticket = req.body;
     ersDao.updateApprovalById(ticket.ticket_id,ticket.approval)
     .then((data) => {
         ersDao.retrievePendingTickets()
         .then((data) => {
-            res.send(data.Items);
+            let msg;
+            if(ticket.approval = 'Approved')
+            {
+                msg = "Ticket Approved";
+            }else{
+                msg = "Ticket Denied";
+            }
+            res.send({
+                message: msg,
+                tickets: data.Items
+            });
         })
         .catch((err) => {
-            //ers.logger.error(err);
+            logger.error(err);
             res.status(400).send("Failed to Approve/Deny Ticket!");
         });
-        //res.send("Approval/Denial Successful!");
     })
     .catch((err) => {
-        //ers.getLogger().error(err);
+        getLogger().error(err);
+        res.status(400).send("Failed to Approve/Deny Ticket!");
+    });
+});
+router.put('/position',  (req, res) => {
+    const ticket = req.body;
+    ersDao.updateApprovalById(ticket.employee,ticket.approval)
+    .then((data) => {
+        res.send("Approval/Denial Successful!");
+    })
+    .catch((err) => {
+        getLogger().error(err);
         res.status(400).send("Failed to Approve/Deny Ticket!");
     });
 });

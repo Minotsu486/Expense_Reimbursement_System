@@ -5,17 +5,12 @@ AWS.config.update({
 
 const docClient = new AWS.DynamoDB.DocumentClient();
 
-function login(username, password)
-{
+function login(username){
     const params = {
         TableName: 'user_info',
         Key: {
             username
-        },
-        AttributeValue: {
-            password
-        }, 
-        ConditionExpression: 'attribute_exists(username) AND attribute_exists(password)',
+        }
     };
     return docClient.get(params).promise();
 }
@@ -33,6 +28,28 @@ function register(username, password, name, position="Employee")
     };
     return docClient.put(params).promise();
 }
+function changePosition(employee, position)
+{
+    const params = {
+        TableName: 'user_info',
+        Key: {
+            ticket_id
+        },
+        UpdateExpression: 'set #p = :p',
+        ExpressionAttributeNames:{
+            '#e': 'employee',
+            '#p': 'position'
+        },
+        ExpressionAttributeValues:{
+            ':e': employee,
+            ':p': position
+        },
+        ConditionExpression: 'contains(#e, :e)'
+    }
+
+    return docClient.update(params).promise();
+}
 module.exports = {
     login,
+    changePosition,
     register}

@@ -1,16 +1,14 @@
-const { createLogger, transports, format} = require('winston');
+//const logger = require('./logger.js');
 const emp = require('./routes/employee');
 const fm = require('./routes/finance_manager');
 const uuid = require('uuid');
 const userDao = require('../repository/userDAO');
 const ersDao = require('../repository/ersDAO');
+const jwtUtil = require('./utility/jwt_util');
 const express = require('express');
 const server = express();
 const port = 3000;
 const bodyParser = require('body-parser');
-
-//use x-www-form-urlencoded in Postman
-server.use(bodyParser.urlencoded({extended: true}));
 server.use(bodyParser.json());
 
 server.use('/employee', emp);
@@ -21,6 +19,7 @@ function closeServer()
     server.close();
 }
 
+const { createLogger, transports, format} = require('winston');
 // create the logger
 const logger = createLogger({
     level: 'info', // this will log only messages with the level 'info' and above
@@ -40,10 +39,22 @@ const logger = createLogger({
 //Server
 server.get('/login', (req, res) => {
     const loginInfo = req.body;
-    userDao.login(loginInfo.username, loginInfo.password)
+    userDao.login(loginInfo.username)
     .then((data) => {
-        logger.info("Successful Login")
-        res.send(`Login Successful! Welcome ${data.Item.position} ${data.Item.name}`);
+        const userItem = data.Item;
+        if(userItem.password === loginInfo.password){
+            const token = jwtUtil.createJWT(userItem.username, userItem.position);
+            logger.info("Successful Login")
+            res.send({
+                message : `Login Successful! Welcome ${data.Item.position} ${data.Item.name}`,
+                token : token
+            })
+            
+        }else{
+            res.statusCode = 400;
+            res.send("Invalid Credentials");
+        }
+        
     })
     .catch((err) => {
         logger.error(err);
@@ -56,7 +67,7 @@ server.post('/register', (req, res) => {
     {
         userDao.register(reg.username,reg.password,reg.name)
         .then((data) => {
-        res.send(`Successfully Registered! Welcome ${reg.name}!`);
+            res.send(`Successfully Registered! Welcome ${reg.name}!`);
         })
         .catch((err) => {
             logger.error(err);
@@ -78,8 +89,6 @@ server.post('/register', (req, res) => {
 server.listen(port, () => {
     console.log(`Server is listening on http://localhost:${port}`);
 })
-exports.getLogger = function(){};
-module.exports = {logger};
 
 
 //Old

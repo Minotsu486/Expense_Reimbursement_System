@@ -172,7 +172,7 @@ function updateApprovalById(ticket_id, approval){
 
     return docClient.update(params).promise();
 }
-
+f
 // Delete
 function deleteTicketById(ticket_id){
     const params = {
