@@ -1,5 +1,8 @@
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const AWS = require('aws-sdk');
-
+const s3 = new S3Client({
+    region: 'us-east-1'
+});
 // In order to perform AWS operations using the aws-sdk library,
 // we need to actually "log in" to AWS through an IAM user
 // This would require you to create an IAM user with the appropriate permissions
@@ -17,7 +20,6 @@ const AWS = require('aws-sdk');
 AWS.config.update({
     region: 'us-east-1'
 });
-
 const docClient = new AWS.DynamoDB.DocumentClient();
 
 
@@ -28,8 +30,10 @@ const docClient = new AWS.DynamoDB.DocumentClient();
 // Delete
 
 // Create
-function addTicket(ticket_id,employee, establishment, type, cost, date,){
+function addTicket(ticket_id,employee, establishment, type, cost, date){
     const approval = "Pending...";
+    let filename = 'No Receipt';
+    
     const params = {
         TableName: 'reimbursement_system',
         Item: {
@@ -40,6 +44,7 @@ function addTicket(ticket_id,employee, establishment, type, cost, date,){
             cost,
             date,
             approval,
+            "receipt" : filename
         }
     }
     return docClient.put(params).promise();
@@ -114,42 +119,6 @@ function retrieveAllTickets(){
     return docClient.scan(params).promise();
 }
 
-// O(N)
-// function retrieveTicketsByEmployee(employee){
-//     const params = {
-//         TableName: 'reimbursement_system',
-//         FilterExpression: '#e = :value',
-//         ExpressionAttributeNames: {
-//             '#e': 'employee'
-//         },
-//         ExpressionAttributeValues: {
-//             ':value': employee
-//         },
-//         //Limit: 1
-//     };
-
-//     return docClient.scan(params).promise();
-// }
-
-// O(1)
-//  This requires you to setup your local secondary index using the same partition key
-// but different sort key on the category
-// function retrieveTicketByCategory(){
-//     const params = {
-//         TableName: 'reimbursement_system',
-//         IndexName: 'category-index',
-//         KeyConditionExpression: '#c = :value',
-//         ExpressionAttributeNames: {
-//             '#c': 'category'
-//         },
-//         ExpressionAttributeValues: {
-//             ':value': category
-//         }
-//     }
-
-//     return docClient.query(params).promise();
-// }
-
 // Update
 
 function updateApprovalById(ticket_id, approval){
@@ -172,7 +141,6 @@ function updateApprovalById(ticket_id, approval){
 
     return docClient.update(params).promise();
 }
-f
 // Delete
 function deleteTicketById(ticket_id){
     const params = {
@@ -184,7 +152,34 @@ function deleteTicketById(ticket_id){
 
     return docClient.delete(params).promise();
 }
+function addReceipt(ticket_id, file)
+{
+    const bucketName = "ers-receipt-bucket";
+    filename = file.originalname;
+    const fileParam = {
+        Bucket: bucketName,
+        Key: filename,
+        Body: file.buffer,
+    }
+    s3.send(new PutObjectCommand(fileParam));
+    const tableParam = {
+        TableName: 'reimbursement_system',
+        Key: {
+            ticket_id
+        },
+        UpdateExpression: 'set #r = :r',
+        ExpressionAttributeNames:{
+            '#r': 'receipt'
+        },
+        ExpressionAttributeValues:{
+            ':r': filename
+        }
+    }
 
+    return docClient.update(tableParam).promise();   
+    
+    
+}
 
 module.exports = {
     addTicket,
@@ -194,5 +189,6 @@ module.exports = {
     retrieveTicketsByType,
     retrievePendingTickets,
     updateApprovalById,
+    addReceipt,
     deleteTicketById
 };

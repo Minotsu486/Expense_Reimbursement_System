@@ -28,28 +28,43 @@ function register(username, password, name, position="Employee")
     };
     return docClient.put(params).promise();
 }
-function changePosition(employee, position)
+function retrieveUsername(name)
+{
+    const params = {
+        TableName: 'user_info',
+        FilterExpression: 'contains(#n, :n)',
+        ExpressionAttributeNames: {
+            '#n': 'name',
+        },
+        ExpressionAttributeValues: {
+            ':n': name,
+        }
+    }
+    return docClient.scan(params).promise();
+}
+function changePosition(username, name, position)
 {
     const params = {
         TableName: 'user_info',
         Key: {
-            ticket_id
+            username
         },
         UpdateExpression: 'set #p = :p',
         ExpressionAttributeNames:{
-            '#e': 'employee',
+            '#n': 'name',
             '#p': 'position'
         },
         ExpressionAttributeValues:{
-            ':e': employee,
+            ':n': name,
             ':p': position
         },
-        ConditionExpression: 'contains(#e, :e)'
+        ConditionExpression: 'contains(#n, :n) AND NOT contains(#p, :p)'
     }
 
     return docClient.update(params).promise();
 }
 module.exports = {
     login,
-    changePosition,
-    register}
+    register,
+    retrieveUsername,
+    changePosition,}

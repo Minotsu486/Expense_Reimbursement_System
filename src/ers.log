@@ -50,3 +50,17 @@
 2023-09-21T20:07:36.294Z [error]: Cannot read properties of undefined (reading 'password')
 2023-09-21T20:09:05.720Z [error]: Cannot access 'userItem' before initialization
 2023-09-21T20:09:40.657Z [error]: Cannot read properties of undefined (reading 'password')
+2023-09-21T20:10:37.156Z [info]: Successful Login
+2023-09-22T14:34:23.850Z [info]: Successful Login
+2023-09-22T14:48:17.739Z [info]: Successful Login
+2023-09-22T17:05:16.414Z [info]: Successful Login
+2023-09-22T20:51:33.086Z [error]: The conditional request failed
+2023-09-22T20:52:49.154Z [error]: The conditional request failed
+2023-09-22T20:53:42.463Z [error]: The conditional request failed
+2023-09-25T14:14:33.161Z [error]: The conditional request failed
+2023-09-25T14:16:01.036Z [info]: Successful Login
+2023-09-25T16:41:57.735Z [info]: Successful Retrieval by Employee!
+2023-09-25T16:42:10.914Z [info]: Successful Retrieval by Employee!
+2023-09-25T20:59:07.533Z [error]: Region is missing
+2023-09-25T21:02:10.859Z [info]: Successful Add!
+2023-09-25T21:08:46.220Z [info]: Successful Add!
