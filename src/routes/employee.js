@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const uuid = require('uuid');
 const ersDao = require('../../repository/ersDAO');
+const userDao = require('../../repository/userDAO');
 const ers = require('../ers');
 const jwtUtil = require('../utility/jwt_util');
 const multer = require("multer");
@@ -45,7 +46,7 @@ function authEmployee(req, res, next)
 }
 router.use(authEmployee);
 
-router.get('/', (req, res) => { 
+router.get('/ticket/all', (req, res) => { 
     const ticket = req.body;
     ersDao.retrieveTicketsByEmployee(ticket.employee)
     .then((data) => {
@@ -70,7 +71,7 @@ router.get('/type', (req, res) => {
     });
 });
 
-router.post('/ticket', (req, res) => {
+router.post('/ticket/id', (req, res) => {
     const ticket = req.body;
     ersDao.addTicket(uuid.v4(), ticket.employee, ticket.establishment, ticket.type, ticket.cost,new Date(Date.now()).toLocaleString())
     .then((data) => {
@@ -103,6 +104,31 @@ router.put('/receipt', upload.single("receipt"), async (req, res) => {
     .catch((err) => {
         logger.error(err);
         res.status(400).send({message: "Failed to Add Receipt!"});
+    });
+});
+router.put('/profile', (req, res) => {
+    const info = req.body;
+    userDao.editAccountInfo(info.username, info)
+    .then((data) => {
+        logger.info("Successfully Edited Profile!")
+        res.send({message:"Successfully Edited Profile!"});
+    })
+    .catch((err) => {
+        logger.error(err);
+        res.status(400).send({message: "Failed to Edit Profile!"});
+    });
+});
+router.put('/picture', upload.single("picture"), async (req, res) => {
+    const info = req.body;
+    const file = req.file;
+    await userDao.addProfilePicture(info.username, file)
+    .then((data) => {
+        logger.info("Successfully Added Picture!")
+        res.send({message:"Successfully Added Picture!"});
+    })
+    .catch((err) => {
+        logger.error(err);
+        res.status(400).send({message: "Failed to Add Picture!"});
     });
 });
 module.exports = router;

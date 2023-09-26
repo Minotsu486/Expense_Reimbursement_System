@@ -41,7 +41,7 @@ function authManager(req, res, next)
         })
 }
 router.use(authManager);
-router.get('/',  (req, res) => {
+router.get('/ticket/all',  (req, res) => {
     ersDao.retrieveAllTickets()
     .then((data) => {
         res.send(data.Items);
@@ -85,7 +85,7 @@ router.get('/pending',  (req, res) => {
         res.status(400).send({message:"Failed to Retrieve Tickets!"});
     });
 });
-router.put('/',  (req, res) => {
+router.put('/approval',  (req, res) => {
     const ticket = req.body;
     ersDao.updateApprovalById(ticket.ticket_id,ticket.approval)
     .then((data) => {

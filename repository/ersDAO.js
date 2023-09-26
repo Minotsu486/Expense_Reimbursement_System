@@ -158,7 +158,7 @@ function addReceipt(ticket_id, file)
     filename = file.originalname;
     const fileParam = {
         Bucket: bucketName,
-        Key: filename,
+        Key: 'receipts/'+filename,
         Body: file.buffer,
     }
     s3.send(new PutObjectCommand(fileParam));
@@ -176,10 +176,9 @@ function addReceipt(ticket_id, file)
         }
     }
 
-    return docClient.update(tableParam).promise();   
-    
-    
+    return docClient.update(tableParam).promise();     
 }
+
 
 module.exports = {
     addTicket,
