@@ -45,8 +45,15 @@ function authEmployee(req, res, next)
         })
 }
 router.use(authEmployee);
-
-router.get('/ticket/all', (req, res) => { 
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype.split("/")[0] === "image") {
+      cb(null, true);
+    } else {
+      cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE"), false);
+    }
+  };
+const upload = multer({fileFilter});
+router.get('/ticket/user', (req, res) => { 
     const ticket = req.body;
     ersDao.retrieveTicketsByEmployee(ticket.employee)
     .then((data) => {
@@ -71,7 +78,7 @@ router.get('/type', (req, res) => {
     });
 });
 
-router.post('/ticket/id', (req, res) => {
+router.post('/ticket', (req, res) => {
     const ticket = req.body;
     ersDao.addTicket(uuid.v4(), ticket.employee, ticket.establishment, ticket.type, ticket.cost,new Date(Date.now()).toLocaleString())
     .then((data) => {
@@ -84,15 +91,7 @@ router.post('/ticket/id', (req, res) => {
     });
 });
 
-const fileFilter = (req, file, cb) => {
-    if (file.mimetype.split("/")[0] === "image") {
-      cb(null, true);
-    } else {
-      cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE"), false);
-    }
-  };
 
-const upload = multer({fileFilter});
 router.put('/receipt', upload.single("receipt"), async (req, res) => {
     const ticket = req.body;
     const file = req.file;

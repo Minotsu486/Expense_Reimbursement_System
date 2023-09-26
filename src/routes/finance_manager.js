@@ -4,6 +4,7 @@ const ersDao = require('../../repository/ersDAO');
 const userDao = require('../../repository/userDAO');
 const ers = require('../ers');
 const jwtUtil = require('../utility/jwt_util');const { createLogger, transports, format} = require('winston');
+const multer = require("multer");
 // create the logger
 const logger = createLogger({
     level: 'info', // this will log only messages with the level 'info' and above
@@ -41,6 +42,15 @@ function authManager(req, res, next)
         })
 }
 router.use(authManager);
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype.split("/")[0] === "image") {
+      cb(null, true);
+    } else {
+      cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE"), false);
+    }
+  };
+
+const upload = multer({fileFilter});
 router.get('/ticket/all',  (req, res) => {
     ersDao.retrieveAllTickets()
     .then((data) => {
@@ -60,7 +70,7 @@ router.get('/id',  (req, res) => {
     .catch((err) => {
         logger.error(err);
         res.sendStatus(400);
-        res.status(400).send({message: "Failed to Retrieve Tickets!"});
+        res.status(400).send({message: "Failed to Retrieve Ticket!"});
     });
 });
 router.get('/name',  (req, res) => {
@@ -91,16 +101,9 @@ router.put('/approval',  (req, res) => {
     .then((data) => {
         ersDao.retrievePendingTickets()
         .then((data) => {
-            let msg;
-            if(ticket.approval = 'Approved')
-            {
-                msg = "Ticket Approved";
-            }else{
-                msg = "Ticket Denied";
-            }
             res.send({
-                message: msg,
-                tickets: data.Items
+                message: `Ticket ${ticket.approval}`,
+                pending_tickets: data.Items
             });
         })
         .catch((err) => {
@@ -139,5 +142,30 @@ router.put('/position',  (req, res) => {
         res.status(400).send({message:`Could not find ${name}`});
     });
     
+});
+router.put('/profile', (req, res) => {
+    const info = req.body;
+    userDao.editAccountInfo(info.username, info)
+    .then((data) => {
+        logger.info("Successfully Edited Profile!")
+        res.send({message:"Successfully Edited Profile!"});
+    })
+    .catch((err) => {
+        logger.error(err);
+        res.status(400).send({message: "Failed to Edit Profile!"});
+    });
+});
+router.put('/picture', upload.single("picture"), async (req, res) => {
+    const info = req.body;
+    const file = req.file;
+    await userDao.addProfilePicture(info.username, file)
+    .then((data) => {
+        logger.info("Successfully Added Picture!")
+        res.send({message:"Successfully Added Picture!"});
+    })
+    .catch((err) => {
+        logger.error(err);
+        res.status(400).send({message: "Failed to Add Picture!"});
+    });
 });
 module.exports = router;
