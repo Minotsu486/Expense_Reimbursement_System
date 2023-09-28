@@ -92,7 +92,7 @@ router.post('/ticket', (req, res) => {
 });
 
 
-router.put('/receipt', upload.single("receipt"), async (req, res) => {
+router.patch('/receipt', upload.single("receipt"), async (req, res) => {
     const ticket = req.body;
     const file = req.file;
     await ersDao.addReceipt(ticket.ticket_id, file)
@@ -117,7 +117,22 @@ router.put('/profile', (req, res) => {
         res.status(400).send({message: "Failed to Edit Profile!"});
     });
 });
-router.put('/picture', upload.single("picture"), async (req, res) => {
+router.get('/profile/info', (req, res) => {
+    const info = req.body;
+    userDao.userInfo(info.username)
+    .then((data) => {
+        logger.info("Successfully Retrieved Profile Info!")
+        res.send({
+            message:"Successfully Retrieved Profile Info!",
+            profile: data.Item
+        });
+    })
+    .catch((err) => {
+    logger.error(err);
+        res.status(400).send({message: "Failed to Retrieve Profile Info!"});
+    });
+});
+router.patch('/picture', upload.single("picture"), async (req, res) => {
     const info = req.body;
     const file = req.file;
     await userDao.addProfilePicture(info.username, file)

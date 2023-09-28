@@ -86,3 +86,34 @@
 2023-09-26T21:27:06.686Z [info]: Successfully Edited Profile!
 2023-09-26T21:35:51.245Z [info]: Successfully Added Picture!
 2023-09-26T21:37:38.711Z [error]: The conditional request failed
+2023-09-28T18:27:17.797Z [error]: "expiresIn" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60
+2023-09-28T18:28:05.868Z [info]: Successful Login
+2023-09-28T18:28:37.480Z [info]: Successful Login
+2023-09-28T18:29:35.372Z [error]: One or more parameter values were invalid: Missing the key username in the item
+2023-09-28T18:30:01.418Z [error]: One or more parameter values were invalid: Missing the key username in the item
+2023-09-28T18:32:29.485Z [info]: Successfully Added Ticket!
+2023-09-28T18:32:53.814Z [info]: Successful Retrieval by Employee!
+2023-09-28T18:33:05.334Z [info]: Successful Retrieval by Type!
+2023-09-28T18:36:02.136Z [info]: Successfully Added Receipt!
+2023-09-28T18:36:29.696Z [info]: Successfully Edited Profile!
+2023-09-28T18:37:39.349Z [info]: Successfully Added Picture!
+2023-09-28T18:40:47.237Z [error]: The conditional request failed
+2023-09-28T18:42:27.971Z [info]: Successfully Edited Profile!
+2023-09-28T18:42:39.405Z [info]: Successfully Added Picture!
+2023-09-28T19:04:14.397Z [info]: Successfully Retrieved Profile Info!
+2023-09-28T19:05:29.951Z [info]: Successfully Retrieved Profile Info!
+2023-09-28T19:05:36.559Z [info]: Successfully Edited Profile!
+2023-09-28T19:05:39.547Z [info]: Successfully Retrieved Profile Info!
+2023-09-28T19:06:00.677Z [info]: Successful Login
+2023-09-28T19:06:03.178Z [info]: Successful Login
+2023-09-28T19:06:06.376Z [info]: Successfully Added Ticket!
+2023-09-28T19:06:09.935Z [info]: Successful Retrieval by Employee!
+2023-09-28T19:06:13.650Z [info]: Successful Retrieval by Type!
+2023-09-28T19:06:16.546Z [info]: Successfully Added Receipt!
+2023-09-28T19:06:20.522Z [info]: Successfully Edited Profile!
+2023-09-28T19:06:24.083Z [info]: Successfully Added Picture!
+2023-09-28T19:06:27.532Z [info]: Successfully Retrieved Profile Info!
+2023-09-28T19:07:15.765Z [info]: Successfully Edited Profile!
+2023-09-28T19:07:19.260Z [info]: Successfully Added Picture!
+2023-09-28T19:07:21.948Z [info]: Successfully Retrieved Profile Info!
+2023-09-28T19:20:19.868Z [info]: Successfully Retrieved Profile Info!

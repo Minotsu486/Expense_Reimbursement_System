@@ -39,7 +39,7 @@ const logger = createLogger({
 //Server
 server.get('/login', (req, res) => {
     const loginInfo = req.body;
-    userDao.login(loginInfo.username)
+    userDao.userInfo(loginInfo.username)
     .then((data) => {
         const userItem = data.Item;
         if(userItem.password === loginInfo.password){

@@ -95,7 +95,7 @@ router.get('/pending',  (req, res) => {
         res.status(400).send({message:"Failed to Retrieve Tickets!"});
     });
 });
-router.put('/approval',  (req, res) => {
+router.patch('/approval',  (req, res) => {
     const ticket = req.body;
     ersDao.updateApprovalById(ticket.ticket_id,ticket.approval)
     .then((data) => {
@@ -116,7 +116,7 @@ router.put('/approval',  (req, res) => {
         res.status(400).send({message:"Failed to Approve/Deny Ticket!"});
     });
 });
-router.put('/position',  (req, res) => {
+router.patch('/position',  (req, res) => {
     const name = req.body.name;
     const position = req.body.position;
     userDao.retrieveUsername(name)
@@ -155,7 +155,22 @@ router.put('/profile', (req, res) => {
         res.status(400).send({message: "Failed to Edit Profile!"});
     });
 });
-router.put('/picture', upload.single("picture"), async (req, res) => {
+router.get('/profile/info', (req, res) => {
+    const info = req.body;
+    userDao.userInfo(info.username)
+    .then((data) => {
+        logger.info("Successfully Retrieved Profile Info!")
+        res.send({
+            message:"Successfully Retrieved Profile Info!",
+            profile: data.Item
+        });
+    })
+    .catch((err) => {
+    logger.error(err);
+        res.status(400).send({message: "Failed to Retrieve Profile Info!"});
+    });
+});
+router.patch('/picture', upload.single("picture"), async (req, res) => {
     const info = req.body;
     const file = req.file;
     await userDao.addProfilePicture(info.username, file)

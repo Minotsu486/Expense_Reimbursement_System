@@ -9,7 +9,7 @@ AWS.config.update({
 
 const docClient = new AWS.DynamoDB.DocumentClient();
 
-function login(username){
+function userInfo(username){
     const params = {
         TableName: 'user_info',
         Key: {
@@ -118,9 +118,10 @@ function addProfilePicture(username, file)
     return docClient.update(tableParam).promise();     
 }
 module.exports = {
-    login,
+    userInfo,
     register,
     retrieveUsername,
     changePosition,
     editAccountInfo,
-    addProfilePicture}
+    addProfilePicture,
+}
